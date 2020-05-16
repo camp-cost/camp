@@ -1,3 +1,2 @@
-# deep-sessions
+# CAMP: Cost-Aware Multiparty Protocols
 
-Deep embedded multiparty session types.
