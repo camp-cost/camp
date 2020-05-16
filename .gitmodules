@@ -1,3 +1,6 @@
 [submodule "benchmarks/savina"]
 	path = benchmarks/savina
 	url = https://github.com/camp-cost/savina
+[submodule "benchmarks/c-pthread"]
+	path = benchmarks/c-pthread
+	url = https://github.com/session-arr/session-arr
