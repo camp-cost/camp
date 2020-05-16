@@ -1,0 +1,3 @@
+[submodule "benchmarks/savina"]
+	path = benchmarks/savina
+	url = https://github.com/camp-cost/savina

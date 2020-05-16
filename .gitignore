@@ -1,0 +1,5 @@
+.stack-work/
+deep-sessions.cabal
+*~
+*.swp
+.#*
