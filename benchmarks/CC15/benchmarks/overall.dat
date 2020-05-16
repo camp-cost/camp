@@ -1,0 +1,7 @@
+heateq        132.4 27.44
+nbody         132.7 4.282
+wordcount     57    23
+adpredictor   656.5 63.5
+montecarlo    0.0466 0.022576
+matvec        17.576146 14.241
+fft64         0.1395 0.197108

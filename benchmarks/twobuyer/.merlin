@@ -1,0 +1,6 @@
+S ml
+S _output
+B _build/ml
+B _build/_output
+PKG fstarlib
+B +threads
