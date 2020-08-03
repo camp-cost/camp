@@ -150,7 +150,14 @@ protocols.
 We list the cost-aware protocols used in the paper, under directory *examples*.
 These are:
 
-- **
+- **OCamlGT.hs**: recursive ping-pong by Imai et al. [2020].
+- **ScribbleGo.hs**: all-to-all, 1-to-all, all-to-1, spectral norm, k-nucleotide
+  and regex-dna; by Castro et al. [2019].
+- **savina-cost**: examples from the Savina benchmarking suite.
+- **PabbleMPI.hs**: examples by Ng et al. [2015].
+- **CParallel.hs**: examples by Castro-Perez and Yoshida [2020].
+- **DBuff.hs**: double buffering protocol, inspired by Yoshida et al. [2008].
 
 ### Benchmarking Data
 
+The cost estimations for
