@@ -188,3 +188,10 @@ msErr = zipWith err msR ms
 -- sizes: 67108864
 printMs :: IO ()
 printMs = printD ms msR msErr
+
+main :: IO ()
+main = do
+  putStrLn "%% FFT: & cost & measured & error "
+  printFft
+  putStrLn "\n\n%% MS: & cost & measured & error "
+  printMs

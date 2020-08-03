@@ -158,6 +158,63 @@ These are:
 - **CParallel.hs**: examples by Castro-Perez and Yoshida [2020].
 - **DBuff.hs**: double buffering protocol, inspired by Yoshida et al. [2008].
 
-### Benchmarking Data
+### Estimating Costs
 
-The cost estimations for
+To run the cost estimations, and print the results from instantiating the
+cost equations, please run:
+
+```
+$ stack runhaskell <example>
+```
+
+For example, executing the command
+
+```
+$ stack runhaskell examples/CParallel.hs
+```
+
+will produce the following result:
+
+```
+%% FFT: & cost & measured & error
+& 143.10000294
+& 143.016404
+& 5.845409174181284e-4
+
+& 74.30000588
+& 74.175541
+& 1.6779773807110488e-3
+
+& 40.52500882
+& 40.817588
+& 7.167968376769449e-3
+
+& 24.26251176
+& 21.755833
+& 0.11521869836011335
+
+& 16.7562647
+& 14.519975
+& 0.1540147073255979
+
+& 13.62814264
+& 12.467197
+& 9.31200204825511e-2
+
+& 12.68908308
+& 11.970078
+& 6.0066866732196626e-2
+
+& 12.84455183
+& 12.686601
+& 1.245020868867877e-2
+
+...
+```
+
+To experiment with different instantiations of the cost models, please load
+the file using GHCi:
+
+```
+$ stack ghci examples/CParallel.hs
+```
