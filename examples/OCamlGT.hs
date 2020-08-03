@@ -6,7 +6,7 @@ import Language.SessionTypes.Common
 import Language.SessionTypes.Cost
 
 ----------------------------------------------------------------------
--- Keigo's paper, Recursive pingpong
+-- Recursive pingpong
 
 rpingpong :: CGT
 rpingpong = gclose $ do
