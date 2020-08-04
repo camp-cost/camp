@@ -49,8 +49,21 @@ pingpongRecv = Map.fromList
 
 -- Message sizes
 -- num pings = 40000
-pingpongTimes :: [Double]
-pingpongTimes = map evalIpc [1, 10, 100, 1000, 10000, 100000]
+pingpongTimes :: Double
+pingpongTimes = 40000 * evalIpc
   where
-    evalIpc :: Integer -> Double
-    evalIpc i = total $ evalTime pingpongSend pingpongRecv (ppSizes i) ppCost
+    evalIpc :: Double
+    evalIpc = total $ evalDelta pingpongSend pingpongRecv (ppSizes 8) ppCost
+
+ppReal :: Double
+ppReal = 3.99e-5
+
+main :: IO ()
+main = do
+  putStrLn "%% pp-akka"
+  putStr "& "
+  print pingpongTimes
+  putStr "& "
+  print ppReal
+  putStr "& "
+  print (abs (pingpongTimes - ppReal) / ppReal)

@@ -221,3 +221,17 @@ wcErr = zipWith err wcR wc
 
 printWc :: IO ()
 printWc = printD wc wcR wcErr
+
+main :: IO ()
+main = do
+  putStrLn  "%% nbody"
+  printD nbody nbodyR nbodyErr
+
+  putStrLn "\n\n%% ls"
+  printD solver solverR solverErr
+
+  putStrLn "\n\n%% ad"
+  printAd
+
+  putStrLn "\n\n%% wc"
+  printWc

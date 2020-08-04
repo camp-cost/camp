@@ -110,3 +110,16 @@ dbuffTimesU = evalIpc 1
   where
     evalIpc :: Integer -> Double
     evalIpc i = total $ evalTime dbuffSend dbuffRecv (ppSizes i) cCostU
+
+main :: IO ()
+main = do
+  putStrLn "%% DBuff Optimised: "
+  putStrLn $ "& " ++ show (dbuffTimes * 1000)
+  putStrLn $ "& " ++ show 0.20544
+  putStrLn $ "& " ++ show (abs (dbuffTimes * 1000 - 0.20544) / 0.20544)
+
+  putStrLn "\n\n%% DBuff Unoptimised: "
+  putStrLn $ "& " ++ show (dbuffTimesU * 1000)
+  putStrLn $ "& " ++ show 0.236397
+  putStrLn $ "& " ++ show (abs (dbuffTimesU * 1000 - 0.236397) / 0.236397)
+

@@ -72,7 +72,20 @@ dphilRecv = Map.fromList
 -- num eating rounds = 1000
 -- num philosophers = 1000
 dphilTimes :: Double
-dphilTimes = evalIpc 1
+dphilTimes = 1000 * evalIpc 1
   where
     evalIpc :: Integer -> Double
-    evalIpc i = total $ evalTime dphilSend dphilRecv (ppSizes 1000) cCost
+    evalIpc i = total $ evalDelta dphilSend dphilRecv (ppSizes 1000) cCost
+
+dphilReal :: Double
+dphilReal = 1.92e-4
+
+main :: IO ()
+main = do
+  putStrLn "%% dphil"
+  putStr "& "
+  print dphilTimes
+  putStr "& "
+  print dphilReal
+  putStr "& "
+  print (abs (dphilTimes - dphilReal) / dphilReal)

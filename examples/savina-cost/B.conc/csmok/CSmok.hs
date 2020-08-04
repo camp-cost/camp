@@ -10,7 +10,7 @@ csmok :: Int -> CGT
 csmok nsmok = gclose $ do
   a <- mkRole
   s <- replicateM nsmok mkRole
-  grec 1 $ \l ->
+  grec 1000 $ \l ->
     choices a s
       (Lbl 1, do
         bcast a s (Var "\\tau_1") (CVar "c_1")
@@ -74,3 +74,16 @@ csmokTimes = evalIpc 1
   where
     evalIpc :: Integer -> Double
     evalIpc i = total $ evalTime csmokSend csmokRecv (ppSizes $ 200 `div` 4) (cCost 4)
+
+csmokReal :: Double
+csmokReal = 1.03e-4
+
+main :: IO ()
+main = do
+  putStrLn "%% csmok"
+  putStr "& "
+  print csmokTimes
+  putStr "& "
+  print csmokReal
+  putStr "& "
+  print (abs (csmokTimes - csmokReal) / csmokReal)

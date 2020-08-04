@@ -57,10 +57,22 @@ countRecv = Map.fromList
   where
     estRecv = 8e-12
 
--- Message sizes
--- num pings = 1000000
-countTimes :: [Double]
-countTimes = map evalIpc [1, 10, 100, 1000, 10000, 100000]
+-- num iterations :
+countTimes :: Double
+countTimes = 1000000 * evalIpc 1
   where
     evalIpc :: Integer -> Double
-    evalIpc i = total $ evalTime countSend countRecv (ppSizes i) cCost
+    evalIpc i = total $ evalDelta countSend countRecv (ppSizes i) cCost
+
+countReal :: Double
+countReal = 1.53e-4
+
+main :: IO ()
+main = do
+  putStrLn "%% count"
+  putStr "& "
+  print countTimes
+  putStr "& "
+  print countReal
+  putStr "& "
+  print (abs (countTimes - countReal) / countReal)

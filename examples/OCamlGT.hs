@@ -77,6 +77,10 @@ ppEvRecv = Map.fromList
   where
     evDist _ = 1.59e-6
 
+ppEvReal :: [Double]
+ppEvReal = [ 6.29e-6, 6.29e-6, 6.29e-6, 6.29e-6]
+
+
 ppEvTimes :: [Double]
 ppEvTimes = map evalEv [1, 10, 100, 1000]
   where
@@ -103,9 +107,27 @@ ppLwtTimes = map evalEv [1, 10, 100, 1000]
   where
     evalEv i = total $ evalTime ppLwtSend ppLwtRecv (ppSizes i) ppCost
 
+ppLwtReal :: [Double]
+ppLwtReal = [ 4.20e-7, 4.20e-7, 4.20e-7, 4.20e-7 ]
 
 err :: Double -> Double -> Double
 err m s = abs (m - s) / m
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+printD :: [Double] -> [Double] -> IO ()
+printD x y = mapM_ putStrLn $ zipWith3 app x y (zipWith err y x)
+  where
+    app a b c = "& " ++ show a ++ "\n& " ++ show b ++ "\n& " ++ show c ++ "\n"
+
+main :: IO ()
+main = do
+  putStrLn "%% pp-ev"
+  printD ppEvTimes ppEvReal
+
+  putStrLn "\n\n%% pp-lwt"
+  printD ppLwtTimes ppLwtReal
+
+  putStrLn "\n\n%% pp-ipc"
+  printD ppIpcTimes realIpcTimes

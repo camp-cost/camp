@@ -42,7 +42,7 @@ ppSizes :: Integer -> Map String Double
 ppSizes nints =
   Map.fromList
           [ ("\\tau", 4) -- in bytes
-          , ("c", 7e-10 + over) -- measured from thr.PingPongAkkaActorSeqCost
+          , ("c", 7e-10 + over)
           ]
   where
     over = fromInteger nints * 4.3500000000000008e-11
@@ -63,10 +63,22 @@ thrRecv = Map.fromList
   where
     estRecv = 8e-11
 
--- Message sizes
--- num pings = 40000
-thrTimes :: [Double]
-thrTimes = map evalIpc [1, 10, 100, 1000, 10000, 100000]
+-- iterations :
+thrTimes :: Double
+thrTimes = 100000 * evalIpc 1
   where
     evalIpc :: Integer -> Double
-    evalIpc i = total $ evalTime thrSend thrRecv (ppSizes 100) (ringCost 4) -- We run a ring of size 100 in Savina in a 4-core machine
+    evalIpc i = total $ evalDelta thrSend thrRecv (ppSizes 100) (ringCost 4) -- We run a ring of size 100 in Savina in a 4-core machine
+
+thrReal :: Double
+thrReal = 5.4e-4
+
+main :: IO ()
+main = do
+  putStrLn "%% ring"
+  putStr "& "
+  print thrTimes
+  putStr "& "
+  print thrReal
+  putStr "& "
+  print (abs (thrTimes - thrReal) / thrReal)

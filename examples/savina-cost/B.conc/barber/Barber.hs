@@ -70,8 +70,21 @@ barberRecv = Map.fromList
 -- Message sizes
 -- num haircuts = 5000
 barberTimes :: Double
-barberTimes = evalIpc 1
+barberTimes = 5000 * evalIpc 1
   where
     evalIpc :: Integer -> Double
-    evalIpc i = total $ evalTime barberSend barberRecv (ppSizes ahr) cCost
+    evalIpc i = total $ evalDelta barberSend barberRecv (ppSizes ahr) cCost
     ahr = 1000 -- busywait takes a random amount of time in implementation. we set it to a fixed parameter that we computed as an average execution time for AHR = 1000
+
+barberReal :: Double
+barberReal = 3.36e-4
+
+main :: IO ()
+main = do
+  putStrLn "%% barb"
+  putStr "& "
+  print barberTimes
+  putStr "& "
+  print barberReal
+  putStr "& "
+  print (abs (barberTimes - barberReal) / barberReal)
