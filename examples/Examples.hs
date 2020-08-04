@@ -1,4 +1,4 @@
-module Cost1 where
+module Examples where
 
 import Control.Monad ( zipWithM_, replicateM )
 import Data.Map.Strict ( Map )
@@ -119,7 +119,7 @@ fft2 = gclose $ mkFft 2
 
 
 ----------------------------------------------------------------------
--- Keigo's paper, Recursive pingpong
+-- Recursive pingpong
 
 rpingpong :: CGT
 rpingpong = gclose $ do

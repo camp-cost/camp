@@ -186,7 +186,7 @@ ones related to §7 and §8:
 
 We will walk through these claims in these step-by-step instructions.
 
-**Claims not supported by this artifact**:
+**Not expected to be supported by this artifact (and the paper)**:
 
 - **performance**: the benchmarks are taken from multiple sources, each with
   their on execution environments. We do not address replicating their reported
