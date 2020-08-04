@@ -17,9 +17,11 @@ the paper.
 
 ### Setup Instructions
 
-We provide a [Docker image](TODO_URL) with the contents of the artifact. We used
-Docker version 19.03.12, build 48a66213fe. Docker can be installed from the
-package managers of the most common Linux distributions. We refer to the [docker
+We provide a [Docker
+image](https://drive.google.com/file/d/1V0ItAAF61N9_GaXynvBRi4LKFfLAXt5b/view?usp=sharing)
+(filename `100.tgz`)  with the contents of the artifact. We used Docker version
+19.03.12, build 48a66213fe. Docker can be installed from the package managers of
+the most common Linux distributions. We refer to the [docker
 website](https://www.docker.com/get-started) for further details on how to get
 started with Docker.
 
