@@ -4,3 +4,7 @@
 [submodule "benchmarks/c-pthread"]
 	path = benchmarks/c-pthread
 	url = https://github.com/session-arr/session-arr
+[submodule "benchmarks/ocaml-mpst"]
+	path = benchmarks/ocaml-mpst
+	url = https://github.com/keigoi/ocaml-mpst.git
+	branch = benchmark

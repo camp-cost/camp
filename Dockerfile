@@ -61,7 +61,7 @@ RUN echo 'export PATH=/opt/ghc/8.6.5/bin/:/home/oopsla20-artifact/.local/bin:$PA
     echo 'colorscheme default' >> /home/oopsla20-artifact/.vimrc && \
     git clone https://github.com/neovimhaskell/haskell-vim.git \
        /home/oopsla20-artifact/.vim/bundle/haskell-vim && \
-    git clone https://github.com/camp-cost/camp \
+    git clone --recurse-submodules https://github.com/camp-cost/camp \
        /home/oopsla20-artifact/CAMP && \
     echo 'system-ghc: true' >> /home/oopsla20-artifact/CAMP/stack.yaml
 
