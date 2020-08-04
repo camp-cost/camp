@@ -151,8 +151,8 @@ scatterGather p i q = do
   scatter p ps
   gather ps q
 
-mkSC :: Int -> CGT
-mkSC i = gclose $ do
+scP :: Int -> CGT
+scP i = gclose $ do
   p <- mkRole
   q <- mkRole
   scatterGather p i q
@@ -160,7 +160,7 @@ mkSC i = gclose $ do
 ad :: [Double]
 ad = map go [1, 2, 4, 8, 12, 16, 24, 48, 64]
   where
-    go i = total $ evalTime cx1Send cx1Recv (adVars i) (cost $ mkSC i)
+    go i = total $ evalTime cx1Send cx1Recv (adVars i) (cost $ scP i)
 
 adR :: [Double]
 adR =
@@ -194,7 +194,7 @@ printAd = printD ad adR adErr
 wc :: [Double]
 wc = map go [1, 2, 4, 8, 12, 16, 24, 48, 64]
   where
-    go i = total $ evalTime cx1Send cx1Recv (wcVars i) (cost $ mkSC i)
+    go i = total $ evalTime cx1Send cx1Recv (wcVars i) (cost $ scP i)
 
 wcR :: [Double]
 wcR =

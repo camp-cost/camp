@@ -169,18 +169,9 @@ dcVars i = Map.fromList [ ("c_m", 0)
                          ]
 
 dcCost :: Double -> Int -> Int -> Double
-dcCost d i j -- = d / fromIntegral i
+dcCost d i j
   | i <= 1 = d
   | otherwise = dcCost (d / 2 + 4.5) (i - 1) (j+1)
-
-
--- divConq i p
---   | i <= 1 = pure (Left p)
---   | otherwise = do
---       q <- mkRole
---       r <- mkRole
---
---       divConq (i-1)
 
 msErr :: [Double]
 msErr = zipWith err msR ms
