@@ -32,6 +32,11 @@ mkSC i = gclose $ do
 mkRoles :: Int -> GTM [Role]
 mkRoles i = sequence (replicate i mkRole)
 
+printD :: [Double] -> [Double] -> [Double] -> IO ()
+printD x y z = mapM_ putStrLn $ zipWith3 app x y z
+  where
+    app a b c = "& " ++ show a ++ "\n& " ++ show b ++ "\n& " ++ show c ++ "\n"
+
 -- go-aa
 allToAllM :: [Role] -> [Role] -> GTM ()
 allToAllM ps qs = mapM_ (`scatter` qs) ps
@@ -96,6 +101,7 @@ errAATimes = zipWith err realAATimes goAATimes
 err :: Double -> Double -> Double
 err m s = abs (m - s) / m
 
+
 -- go-1a
 oneToAllM :: Role -> [Role] -> GTM ()
 oneToAllM = scatter
@@ -125,6 +131,7 @@ real1ATimes = [ 2315.19e-9
 err1ATimes :: [Double]
 err1ATimes = zipWith err real1ATimes go1ATimes
 
+
 -- go-a1
 allToOneM :: [Role] -> Role -> GTM ()
 allToOneM = gather
@@ -146,6 +153,7 @@ realA1Times = [ 2296.84e-9
 
 errA1Times :: [Double]
 errA1Times = zipWith err realA1Times goA1Times
+
 
 --------------------------------------------------------------------------------
 -- CLBG
@@ -223,7 +231,6 @@ snReal = [ 11577124467e-9
 
 snErr :: [Double]
 snErr = zipWith err snReal sn
-
 
 --------------------------------------------------------------------------------
 -- KNuc
@@ -327,3 +334,29 @@ dnaR  = [ 2931456050e-9
 
 dnaErr :: [Double]
 dnaErr = zipWith err dnaR dna
+
+main :: IO ()
+main = do
+  putStrLn "%% go-aa"
+  printD goAATimes realAATimes errAATimes
+  putStrLn "\n"
+
+  putStrLn "%% go-1a"
+  printD go1ATimes real1ATimes err1ATimes
+  putStrLn "\n"
+
+  putStrLn "%% go-a1"
+  printD goA1Times realA1Times errA1Times
+  putStrLn "\n"
+
+  putStrLn "%% sn"
+  printD sn snReal snErr
+  putStrLn "\n"
+
+  putStrLn "%% knuc"
+  printD knuc knucR knucErr
+  putStrLn "\n"
+
+  putStrLn "%% dna"
+  printD dna dnaR dnaErr
+  putStrLn "\n"

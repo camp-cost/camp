@@ -90,3 +90,10 @@ tbRecv = Map.fromList
 
 tbTimes :: Double
 tbTimes = total $ evalTime tbSend tbRecv sizes tbCost
+
+main :: IO ()
+main = do
+  putStrLn "%% Two Buyer : "
+  putStrLn $ "& " ++ show tbTimes
+  putStrLn $ "& " ++ show 3.0449380434782607
+  putStrLn $ "& " ++ show (abs (tbTimes - 3.0449380434782607) / 3.0449380434782607)
