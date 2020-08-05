@@ -174,6 +174,9 @@ in *CAMP: Cost-Aware Multiparty Session Protocols*.  The implementation is a
 Haskell library, that provides a monadic interface for specifying multiparty
 protocols.
 
+To evaluate the cost models for all of our cost-aware protocols, we provide
+script `./run.sh`.
+
 **Paper claims supported by this artifact**: The paper, in last paragraph of §1
 (p. 3) states "The anonymised git repository https://github.com/camp-cost/camp
 provides a working prototype implementation, described in §7 and the data used
@@ -411,6 +414,3 @@ the file using GHCi:
 ```
 $ stack ghci examples/CParallel.hs
 ```
-
-Finally, to evaluate our currently used cost models, we provide script
-`./run.sh`.
