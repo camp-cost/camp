@@ -35,7 +35,7 @@ examples. Please find in README.md a more detailed description. \n\
   * src  ................... Source code of the libraries \n\
   * app  ................... Source code of the scripts \n\
   * examples  .............. Source code of the protocols \n\
-  * benchmark_data  ........ Data used in the paper \n\
+  * benchmarks ............. Data used in the paper \n\
 \n"\
     > /etc/welcome
 
