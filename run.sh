@@ -2,7 +2,7 @@
 
 echo "Extracting and evaluating cost models"
 
-for i in `find examples -iname '*.hs'`; do
+for i in `find examples ! -name 'Examples.hs' -iname '*.hs'`; do
   echo
   echo "Evaluating file \'$i\'"
   echo
