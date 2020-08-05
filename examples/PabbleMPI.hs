@@ -224,7 +224,7 @@ printWc = printD wc wcR wcErr
 
 main :: IO ()
 main = do
-  putStrLn  "%% nbody"
+  putStrLn  "%% nb"
   printD nbody nbodyR nbodyErr
 
   putStrLn "\n\n%% ls"

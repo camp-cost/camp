@@ -288,7 +288,7 @@ respectively).
 **Savina benchmarking suite**. They can be found under directory
 `examples/savina`. They are separated into `A.microbenchmarks` and
 `B.conc`. The files are given the same names as in the paper (See last paragraph
-of p.18, and paragraph *Concurrency benchmarks* in p.19.
+of p.18, and paragraph *Concurrency benchmarks* in p.19).
 
 **C-MPI by Ng et al. [2019]**. These are in file `examples/PabbleMPI.hs`.
 Functions `ringP`, `meshP`, `scP` capture ring, mesh and scatter-gather
@@ -408,9 +408,35 @@ will produce the following result:
 ...
 ```
 
-To experiment with different instantiations of the cost models, please load
-the file using GHCi:
+Finally, it is possible to evaluate these examples in GHCi. For example:
 
 ```
 $ stack ghci examples/CParallel.hs
 ```
+
+Then, once in GHCi, you can browse the definitions of the module:
+
+```
+*CParallel> :browse
+mkRoles :: Int -> GTM [Role]
+...
+fft :: [Double]
+```
+
+Additionally, you can print global types
+
+```
+*CParallel> print $ mkFft 1
+CGSend 0 1 (Var "\\tau") (CGSend 1 0 (Var "\\tau") (CGRecv 0 1 (Var "\\tau")
+(CVar "c_1") (CGRecv 1 0 (Var "\\tau") (CVar "c_1") CGEnd)))
+```
+
+and print the generated cost equations:
+```
+*CParallel> putStrLn $ showEqns $ cost $ mkFft 1
+r0 = T_recv (r0, r1, \tau) + c_1 + max (T_send (r0, r1, \tau), T_send (r1, r0, \tau))
+r1 = T_recv (r1, r0, \tau) + c_1 + max (T_send (r1, r0, \tau), T_send (r0, r1, \tau))
+```
+
+
+

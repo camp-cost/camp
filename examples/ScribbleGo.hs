@@ -353,7 +353,7 @@ main = do
   printD sn snReal snErr
   putStrLn "\n"
 
-  putStrLn "%% knuc"
+  putStrLn "%% kn"
   printD knuc knucR knucErr
   putStrLn "\n"
 

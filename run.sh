@@ -7,6 +7,6 @@ for i in `find examples ! -name 'Examples.hs' -iname '*.hs'`; do
   echo "Evaluating file \'$i\'"
   echo
   stack runhaskell $i
-  echo "Done, press any key to continue"
+  echo "Done, press ENTER to continue"
   read
 done

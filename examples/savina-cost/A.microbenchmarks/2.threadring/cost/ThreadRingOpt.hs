@@ -75,7 +75,7 @@ thrReal = 5.4e-4
 
 main :: IO ()
 main = do
-  putStrLn "%% ring"
+  putStrLn "%% ring-opt"
   putStr "& "
   print thrTimes
   putStr "& "

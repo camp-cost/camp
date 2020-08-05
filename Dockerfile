@@ -1,5 +1,5 @@
 #Download base image haskell 8.8
-FROM haskell:8.8
+FROM haskell:8.8.2
 
 ###############################################################################
 # Install dependencies
@@ -48,9 +48,11 @@ RUN useradd -ms /bin/bash oopsla20-artifact
 ###############################################################################
 # Download and build artifact
 
+RUN stack update && stack upgrade
+
 USER oopsla20-artifact
 
-RUN echo 'export PATH=/opt/ghc/8.6.5/bin/:/home/oopsla20-artifact/.local/bin:$PATH' >> \
+RUN echo 'export PATH=/opt/ghc/8.8.2/bin/:/home/oopsla20-artifact/.local/bin:$PATH' >> \
       /home/oopsla20-artifact/.bashrc && \
     mkdir -p /home/oopsla20-artifact/.vim/autoload ~/.vim/bundle && \
     curl -LSso /home/oopsla20-artifact/.vim/autoload/pathogen.vim \
