@@ -215,3 +215,8 @@ err m s = abs (m - s) / m
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+main :: IO ()
+main =
+  putStrLn "This file only contains simple examples of cost-aware protocols. \
+      \ It does not instantiate any cost equation."
