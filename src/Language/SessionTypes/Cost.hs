@@ -35,6 +35,10 @@ module Language.SessionTypes.Cost
   , evalDelta
   , unroll
   , latexEqns
+  , RTSt (..)
+  , RTime(..)
+  , emptyRTSt
+  , rbCost
   ) where
 
 import Control.Monad.State.Strict
@@ -575,16 +579,16 @@ sendCost rs sz f = modify $ alterTime step f
     step Nothing = CSend f rs sz
     step (Just c) = CAdd (CSend f rs sz) c
 
-enqueue :: Maybe [Cost String] -> Cost String -> Maybe [Cost String]
+enqueue :: Maybe [a] -> a -> Maybe [a]
 enqueue Nothing c = Just [c]
 enqueue (Just q) c = Just $ q ++ [c]
 
-dequeue :: (Role, Role) -> MsgQ -> (Maybe VCost, MsgQ)
+dequeue :: (Role, Role) -> Map (Role, Role) [a] -> (Maybe a, Map (Role, Role) [a])
 dequeue k m
   | Just (h:t) <- Map.lookup k m = (Just h, Map.insert k t m)
   | otherwise = (Nothing, m)
 
--- FIXME
+-- FIXME: merge with sendCost/recvCost
 asendCost :: Role -> VSize -> Role -> MTime ()
 asendCost rs sz f = do
   s <- get
@@ -690,28 +694,34 @@ evalTime :: Map (Role, Role) (Double -> Double)
          -> Map String Double
          -> Time
          -> Map Role Double
-evalTime csend crecv vars = Map.map evalC
+evalTime csend crecv vars = Map.map (evalCc csend crecv vars)
+
+evalCc :: Map (Role, Role) (Double -> Double)
+      -> Map (Role, Role) (Double -> Double)
+      -> Map String Double
+      -> VCost
+      -> Double
+evalCc csend crecv vars = evalC
   where
-    evalC :: VCost -> Double
-    evalC (CSize s    ) = evalS s
+    evalC (CSize s    ) = evalS vars s
     evalC (CVar v     ) = fromMaybe 0 $! Map.lookup v vars
     evalC (CRec _     ) = 0 -- XXX: Fixme
     evalC (CAdd l r   ) = evalC l + evalC r
     evalC (CMax l r   ) = max (evalC l) (evalC r)
-    evalC (CMul l r   ) = evalS l * evalC r
-    evalC (CSend f t s) = maybe 0 ($ evalS s) (Map.lookup (f, t) csend)
-    evalC (CRecv f t s) = maybe 0 ($ evalS s) (Map.lookup (f, t) crecv)
+    evalC (CMul l r   ) = evalS vars l * evalC r
+    evalC (CSend f t s) = maybe 0 ($ evalS vars s) (Map.lookup (f, t) csend)
+    evalC (CRecv f t s) = maybe 0 ($ evalS vars s) (Map.lookup (f, t) crecv)
     evalC (CDelta r d ) = rd 2 - rd 1
       where
         rd i = maybe 0 evalC $! Map.lookup r (unroll i d)
 
-    evalS :: VSize -> Double
-    evalS (Var v   ) = fromMaybe 0 $! Map.lookup v vars
-    evalS (K k     ) = fromInteger k
-    evalS (SAdd l r) = evalS l + evalS r
-    evalS (SSub l r) = evalS l - evalS r
-    evalS (SMul l r) = evalS l * evalS r
-    evalS (SDiv l r) = evalS l / evalS r
+evalS :: Map String Double -> VSize -> Double
+evalS m (Var v   ) = fromMaybe 0 $! Map.lookup v m
+evalS _ (K k     ) = fromInteger k
+evalS m (SAdd l r) = evalS m l + evalS m r
+evalS m (SSub l r) = evalS m l - evalS m r
+evalS m (SMul l r) = evalS m l * evalS m r
+evalS m (SDiv l r) = evalS m l / evalS m r
 
 unrollTime :: Time -> Time -> Time
 unrollTime to = Map.map doUnroll
@@ -751,22 +761,166 @@ evalDelta :: Map (Role, Role) (Double -> Double)
 evalDelta csend crecv vars = Map.map evalC
   where
     evalC :: VCost -> Double
-    evalC (CSize s    ) = evalS s
+    evalC (CSize s    ) = evalS vars s
     evalC (CVar v     ) = fromMaybe 0 $! Map.lookup v vars
     evalC (CRec _     ) = 0 -- XXX: Fixme
     evalC (CAdd l r   ) = evalC l + evalC r
     evalC (CMax l r   ) = max (evalC l) (evalC r)
-    evalC (CMul l r   ) = evalS l * evalC r
-    evalC (CSend f t s) = maybe 0 ($ evalS s) (Map.lookup (f, t) csend)
-    evalC (CRecv f t s) = maybe 0 ($ evalS s) (Map.lookup (f, t) crecv)
+    evalC (CMul l r   ) = evalS vars l * evalC r
+    evalC (CSend f t s) = maybe 0 ($ evalS vars s) (Map.lookup (f, t) csend)
+    evalC (CRecv f t s) = maybe 0 ($ evalS vars s) (Map.lookup (f, t) crecv)
     evalC (CDelta r d ) = rd 2 - rd 1
       where
         rd i = maybe 0 evalC $! Map.lookup r (unroll i d)
 
-    evalS :: VSize -> Double
-    evalS (Var v   ) = fromMaybe 0 $! Map.lookup v vars
-    evalS (K k     ) = fromInteger k
-    evalS (SAdd l r) = evalS l + evalS r
-    evalS (SSub l r) = evalS l - evalS r
-    evalS (SMul l r) = evalS l * evalS r
-    evalS (SDiv l r) = evalS l / evalS r
+-- | Resource-bound cost
+--
+
+data RTSt = RTSt
+  { rtime :: Map Role Double
+  , rmsgQ :: Map (Role, Role) [Double]
+  , rclock :: Map Int (Map Int Double)
+  , rmapping :: Map Role Int
+
+  , mdist :: Map (Role, Role) (Double -> Double)
+  , msizes :: Map String Double
+  }
+
+emptyRTSt :: RTSt
+emptyRTSt = RTSt { rtime = Map.empty
+                , rmsgQ = Map.empty
+                , rclock = Map.empty
+                , rmapping = Map.empty
+                , mdist = Map.empty
+                , msizes = Map.empty
+                }
+
+newtype RTime a = RTime { unRTime :: State RTSt a }
+  deriving (Functor, Applicative, Monad, MonadState RTSt)
+
+
+instance Semigroup (RTime ()) where
+  c1 <> c2 = do
+    s <- get
+    s1 <- c1 *> get <* put s
+    s2 <- c2 *> get
+    put $! RTSt { rtime = Map.unionWith max (rtime s1) (rtime s2)
+                , rmsgQ = Map.unionWith max (rmsgQ s1) (rmsgQ s2)
+                , rclock = Map.unionWith (Map.unionWith max) (rclock s1) (rclock s2)
+                , rmapping = rmapping s
+                , mdist = mdist s
+                , msizes = msizes s
+                }
+
+instance Monoid (RTime ()) where
+  mempty = pure ()
+
+rbCost :: CGT -> RTime ()
+rbCost CGEnd = pure ()
+rbCost CGVar{} = pure ()
+rbCost (CGRec v i g) = rbCost (unrollG i v g)
+rbCost (CComm f t ty c k) = do
+  st <- get
+  cSendCost t (evalS (msizes st) ty) f
+  cRecvCost f (evalS (msizes st) ty) (evalCc (mdist st) (mdist st) (msizes st) c) t
+  rbCost k
+rbCost (CGSend f t ty k) = do
+  st <- get
+  caSendCost t (evalS (msizes st) ty) f
+  rbCost k
+rbCost (CGRecv f t ty c k) = do
+  st <- get
+  caRecvCost f (evalS (msizes st) ty) (evalCc (mdist st) (mdist st) (msizes st) c) t
+  rbCost k
+rbCost (CChoice r1 rs alts) = do
+  cSendCost rs 1 r1
+  cRecvCost r1 1 0 rs
+  foldAlt (<>) mempty (mapAlt (const rbCost) alts)
+
+lookupKey :: Eq v => v -> Map.Map k v -> Maybe k
+lookupKey val = Map.foldlWithKey' go Nothing where
+  go k@Just{} _ _ = k
+  go Nothing k v
+    | v == val = Just k
+    | otherwise = Nothing
+
+mmin :: Map Int Double -> Double
+mmin m = minimum $ Map.elems m
+
+getNode :: Role -> RTSt -> Int
+getNode r st =
+  fromMaybe err $ Map.lookup r $ rmapping st
+  where
+    err = error $ "Participant " ++ show r ++ " is not assigned to any node"
+
+getAvailableCore :: Role -> RTSt -> (Int, Int, Double)
+getAvailableCore r st =
+    case Map.lookup nd $ rclock st of
+      Nothing -> error $ "Node " ++ show nd ++ " contains no nodes"
+      Just cs ->
+        let d = mmin cs
+        in (nd, fromMaybe (error "Impossible") $ lookupKey d cs, d)
+  where
+    nd = getNode r st
+
+calterTime :: (Maybe Double -> Double) -> Role -> Int -> Int -> RTSt -> RTSt
+calterTime f r nd c s =
+    s' { rclock = Map.insert nd  ndc $ rclock s'
+       }
+  where
+    ndc = Map.insert c (rtime s' Map.! r) $ rclock s' Map.! nd
+    s' = s { rtime = Map.alter (Just . f) r $ rtime s }
+
+
+cSendCost :: Role -> Double -> Role -> RTime ()
+cSendCost rs sz f = do
+  st <- get
+  case Map.lookup (f, rs) $ mdist st of
+    Nothing -> error $ "Queue for " ++ show (f, rs) ++ " does not exist"
+    Just fs -> do
+      (nd, c, d) <- gets (getAvailableCore f)
+      let step x =
+            case x of
+              Nothing -> fs sz + d
+              Just c' -> fs sz + max d c'
+      modify $ calterTime step f nd c
+
+cRecvCost :: Role -> Double -> Double -> Role -> RTime ()
+cRecvCost rs sz cc f = modify $ \s ->
+  let (nd, c, d) = getAvailableCore f s
+      step c1 c2 = (mdist s Map.! (rs, f)) sz + cc + max (max c1 (fromMaybe 0 c2)) d
+  in case Map.lookup rs $ rtime s of
+       Nothing -> calterTime (step 0)   f nd c s
+       Just c' -> calterTime (step c') f nd c s
+
+-- FIXME: merge
+caSendCost :: Role -> Double -> Role -> RTime ()
+caSendCost rs sz f = do
+  st <- get
+  case Map.lookup (f, rs) $ mdist st of
+    Nothing -> error $ "Queue for " ++ show (f, rs) ++ " does not exist"
+    Just fs -> do
+      (nd, c, d) <- gets (getAvailableCore f)
+      let step x =
+            case x of
+              Nothing -> fs sz + d
+              Just c' -> fs sz + max d c'
+      let tf = step (Map.lookup f $ rtime st)
+          ndc = Map.insert c tf $ rclock st Map.! nd
+      put st { rtime = Map.insert f tf $ rtime st
+             , rmsgQ = Map.alter (`enqueue` tf) (f, rs) $ rmsgQ st
+             , rclock = Map.insert nd  ndc $ rclock st
+             }
+
+caRecvCost :: Role -> Double -> Double -> Role -> RTime ()
+caRecvCost rs sz cc f = modify $ \s ->
+  let (td', dq) = dequeue (rs, f) $ rmsgQ s
+      td = max (fromMaybe 0 td') d
+      (nd, c, d) = getAvailableCore f s
+      step c1 c2 = (mdist s Map.! (rs, f)) sz + cc + max c1 (fromMaybe 0 c2)
+      tf = step td (Map.lookup f $ rtime s)
+      ndc = Map.insert c tf $ rclock s Map.! nd
+  in s { rtime = Map.insert f tf $ rtime s
+       , rmsgQ = dq
+       , rclock = Map.insert nd ndc $ rclock s
+       }

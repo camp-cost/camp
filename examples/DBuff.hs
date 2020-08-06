@@ -1,6 +1,5 @@
 module DBuff where
 
-import Control.Monad ( replicateM )
 import Language.SessionTypes.Common
 import Language.SessionTypes.Cost
 import Data.Map.Strict ( Map )
@@ -62,7 +61,7 @@ total :: Map Role Double -> Double
 total = Map.foldl' max 0
 
 ppSizes :: Integer -> Map String Double
-ppSizes nints =
+ppSizes _nints =
   Map.fromList
           [ ("\\tau_1", 1) -- in bytes
           , ("\\tau_2", 1)
@@ -70,8 +69,6 @@ ppSizes nints =
           , ("cr",  0.0755 / 1000)
           , ("cu",  0.001117 / 1000)
           ]
-  where
-    sz = fromInteger nints
 
 dbuffSend :: Map (Role, Role) (Double -> Double)
 dbuffSend = Map.fromList
@@ -115,11 +112,11 @@ main :: IO ()
 main = do
   putStrLn "%% DBuff Optimised: "
   putStrLn $ "& " ++ show (dbuffTimes * 1000)
-  putStrLn $ "& " ++ show 0.20544
+  putStrLn $ "& " ++ "0.20544"
   putStrLn $ "& " ++ show (abs (dbuffTimes * 1000 - 0.20544) / 0.20544)
 
   putStrLn "\n\n%% DBuff Unoptimised: "
   putStrLn $ "& " ++ show (dbuffTimesU * 1000)
-  putStrLn $ "& " ++ show 0.236397
+  putStrLn $ "& " ++ "0.236397"
   putStrLn $ "& " ++ show (abs (dbuffTimesU * 1000 - 0.236397) / 0.236397)
 

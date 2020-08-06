@@ -23,15 +23,15 @@ _sendDist _ = 2.17e-06
 _recvDist _ = 0.77e-06
 
 cx1Send :: Map (Role, Role) (Double -> Double)
-cx1Send = Map.fromList [ ((Rol r1, Rol r2), dist) | r1 <- rs, r2 <- rs ]
+cx1Send = Map.fromList [ ((Rol r1, Rol r2), ddist) | r1 <- rs, r2 <- rs ]
   where
-    dist = _sendDist
+    ddist = _sendDist
     rs = [0..65]
 
 cx1Recv :: Map (Role, Role) (Double -> Double)
-cx1Recv = Map.fromList [ ((Rol r1, Rol r2), dist) | r1 <- rs, r2 <- rs ]
+cx1Recv = Map.fromList [ ((Rol r1, Rol r2), ddist) | r1 <- rs, r2 <- rs ]
   where
-    dist = _recvDist
+    ddist = _recvDist
     rs = [0..65]
 
 printD :: [Double] -> [Double] -> [Double] -> IO ()
