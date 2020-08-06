@@ -64,6 +64,10 @@ installation.
 
 ### Artifact Contents
 
+We provide the source code of all of our examples. Additionally, the docker
+image contains the `vim` editor with Haskell support, for inspecting the files.
+The main files in the artifact are:
+
 * `README.md`: This file
 * `LICENSE`: BSD-3 license
 * `src`: Source code of the cost-aware multiparty protocol library
